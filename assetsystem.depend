@@ -1,5 +1,15 @@
 # depslib dependency file v1.0
-1621675528 source:c:\users\khai\onedrive - universiti malaysia pahang\dci1023 project\assetsystem\main.c
+1621697122 source:c:\users\khai\onedrive - universiti malaysia pahang\dci1023 project\assetsystem\main.c
+	<stdio.h>
+	<stdlib.h>
+	<string.h>
+
+1621755295 source:c:\users\khai\onedrive - universiti malaysia pahang\dci1023 project\assetsystem\dci1023-asset-tracking\main.c
+	<stdio.h>
+	<stdlib.h>
+	<string.h>
+
+1621751282 source:c:\users\khai\desktop\assetsystem\dci1023-asset-tracking\main.c
 	<stdio.h>
 	<stdlib.h>
 	<string.h>
