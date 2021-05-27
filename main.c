@@ -30,6 +30,8 @@ int main()
         addAsset(fpAssets);
     } else if(userAction==2){
         listAsset(fpAssets);
+    } else if(userAction==3){
+        updateAsset();
     } else if(userAction==4){
         deleteAsset();
     } else {
@@ -43,7 +45,7 @@ int main()
 
 void fileVerification(FILE *fpAssets){
     if(fpAssets==NULL){
-        printf("!! ERROR OPENING FILE !!");
+        printf("!! ERROR OPENING FILE !!");     //Error file handler
         exit(-1);
     }
 }
@@ -52,7 +54,7 @@ void addAsset(FILE *fpAssets){
     char assetID[4], assetName[50], assetType[10], assetLocation[20];
     float assetValue;
 
-    fpAssets = fopen("assets.txt", "a");
+    fpAssets = fopen("assets.txt", "a");        //Open file to append new data
     fileVerification(fpAssets);
 
     printf("Enter asset ID : ");
@@ -66,7 +68,7 @@ void addAsset(FILE *fpAssets){
     printf("Enter asset value : ");
     scanf("%f", &assetValue);
 
-    fprintf(fpAssets, "\n%s %s %s %s %.2f", assetID, assetName, assetType, assetLocation, assetValue);
+    fprintf(fpAssets, "\n%s %s %s %s %.2f", assetID, assetName, assetType, assetLocation, assetValue); //Insert data to file
     fclose(fpAssets);
 }
 
@@ -101,6 +103,64 @@ void listAsset(FILE* fpAssets){
     fclose(fpAssets);
 }
 
+void updateAsset(){
+    FILE* fpAssets;
+    FILE* fpTemp;
+    char buffer[BUFFER_SIZE];
+    char newLine[BUFFER_SIZE];
+
+    int line, count, i=1, ret;
+
+    fpAssets = fopen("assets.txt", "r");
+
+    while(!feof(fpAssets)){
+        fgets(buffer, BUFFER_SIZE, fpAssets);
+        printf("%d. %s", i, buffer);
+        i++;
+    }
+
+    rewind(fpAssets);
+
+    printf("\nEnter the line number to update asset : ");
+    scanf("%d", &line);
+
+    fflush(stdin);
+
+    printf("\nEnter new data asset for line '%d' :", line);
+    fgets(newLine, BUFFER_SIZE, stdin);
+
+    fpTemp = fopen("replace.tmp", "w");
+
+    if (fpAssets == NULL || fpTemp == NULL){
+        printf("Unable to open file\n");
+        exit(-1);
+    }
+
+    count=0;
+    while((fgets(buffer, BUFFER_SIZE, fpAssets)) != NULL){
+        count++;
+
+        if (count == line){
+            fputs(newLine, fpTemp);
+        } else {
+            fputs(buffer, fpTemp);
+        }
+    }
+
+    fclose(fpAssets);
+    fclose(fpTemp);
+
+    ret = remove("assets.txt");
+    rename("replace.tmp", "assets.txt");
+
+    if(ret==0){
+        printf("Succesfully updated data!\n");
+    } else {
+        printf("Failed to update data!\n");
+    }
+
+}
+
 void deleteAsset(){
     FILE* fpNewAssets;
     FILE* fpAssets;
@@ -110,34 +170,35 @@ void deleteAsset(){
     fpAssets = fopen("assets.txt", "r");
     fpNewAssets = fopen("assetsTMP.tmp", "w");
 
-    while(!feof(fpAssets)){
+    while(!feof(fpAssets)){                                   //Display list of assets
         fgets(buffer, BUFFER_SIZE, fpAssets);
         printf("%d. %s", i, buffer);
         i++;
     }
 
-    printf("\nPlease enter the line no. to delete : ");
+    printf("\nPlease enter the line no. to delete : ");       //Enter the line that wants to get deleted
     scanf("%d", &line);
 
-    rewind(fpAssets);
+    rewind(fpAssets);                                         //Point filePointer back to start of file
 
-    while((fgets(buffer, BUFFER_SIZE, fpAssets)) != NULL){
+    while((fgets(buffer, BUFFER_SIZE, fpAssets)) != NULL){    //Write all the contents from old file to new file, skipping the deleted line
         if (line != count)
             fputs(buffer, fpNewAssets);
 
         count++;
     }
 
-    fclose(fpAssets);
+    fclose(fpAssets);                               //Close all file
     fclose(fpNewAssets);
 
-    remove("assets.txt");
-    ret = rename("assetsTMP.tmp", "assets.txt");
-        if(ret == 0){
-            printf("\nAsset deleted succesfully !");
+    remove("assets.txt");                           //Delete old file
+    ret = rename("assetsTMP.tmp", "assets.txt");    //Rename new file to old file name
+
+        if(ret == 0){                                           //Error handling
+            printf("\nAsset deleted succesfully !\n");
         }
         else {
-        printf("Error: unable to delete data !");
+        printf("Error: unable to delete data !\n");
         fprintf(stderr, "System error (%d): %s\n", errno, strerror(errno));
         }
 
